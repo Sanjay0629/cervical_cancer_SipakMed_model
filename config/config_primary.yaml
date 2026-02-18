@@ -1,5 +1,5 @@
-# Config with INCREASED CAPACITY
-# Same DenseNet121 but bigger classification head
+# Optimized Config for BALANCED Dataset
+# Your data is well-balanced, so we focus on better training strategy
 
 dataset:
   data_dir: "data/raw"
@@ -20,6 +20,7 @@ preprocessing:
   normalize: true
   stain_normalization: false
 
+# Moderate augmentation
 augmentation:
   rotation_range: 15
   width_shift_range: 0.08
@@ -31,13 +32,13 @@ augmentation:
   fill_mode: "nearest"
 
 model:
-  base_model: "DenseNet121"
+  base_model: "DenseNet121"      # Better than ResNet50 for medical images
   input_shape: [224, 224, 3]
   num_classes: 5
   
-  # INCREASED CAPACITY - Bigger head
-  dense_units: [768, 384, 192]      # Was [512, 256]
-  dropout_rates: [0.45, 0.35, 0.25]  # Slightly higher dropout
+  # Stronger classification head
+  dense_units: [512, 256]
+  dropout_rates: [0.4, 0.3]
   use_batch_norm: true
   
   pretrained_weights: "imagenet"
@@ -45,16 +46,16 @@ model:
 
 training:
   stage1:
-    epochs: 30                    # Slightly longer for bigger head
+    epochs: 25                    # Train head thoroughly
     batch_size: 32
-    learning_rate: 0.001
+    learning_rate: 0.001          # Standard rate
     freeze_base: true
   
   stage2:
-    epochs: 50                    # More epochs
+    epochs: 45                    # Extended fine-tuning
     batch_size: 32
-    learning_rate: 0.0001
-    unfreeze_layers: 40           # Unfreeze more (was 30)
+    learning_rate: 0.0001         # 10X HIGHER than your failed attempt
+    unfreeze_layers: 30           # Conservative unfreezing
   
   optimizer: "adam"
   loss: "categorical_crossentropy"
@@ -64,20 +65,20 @@ training:
     - "precision"
     - "recall"
   
-  use_class_weights: false
+  use_class_weights: false        # Not needed since balanced
   mixed_precision: false
 
 callbacks:
   early_stopping:
     monitor: "val_loss"
-    patience: 15                  # More patience
+    patience: 12
     restore_best_weights: true
-    min_delta: 0.0005             # Smaller threshold
+    min_delta: 0.001
   
   reduce_lr:
     monitor: "val_loss"
     factor: 0.5
-    patience: 6
+    patience: 5
     min_lr: 0.0000001
     verbose: 1
   

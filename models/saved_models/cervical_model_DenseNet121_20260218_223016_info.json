@@ -1,5 +1,5 @@
 {
-    "timestamp": "20260218_185207",
+    "timestamp": "20260218_223017",
     "model_name": "DenseNet121",
     "input_shape": [
         224,
@@ -7,8 +7,8 @@
         3
     ],
     "num_classes": 5,
-    "total_parameters": 7697989,
-    "trainable_parameters": 1300357,
+    "total_parameters": 8200261,
+    "trainable_parameters": 1987781,
     "config": {
         "dataset": {
             "data_dir": "data/raw",
@@ -54,12 +54,14 @@
             ],
             "num_classes": 5,
             "dense_units": [
-                512,
-                256
+                768,
+                384,
+                192
             ],
             "dropout_rates": [
-                0.4,
-                0.3
+                0.45,
+                0.35,
+                0.25
             ],
             "use_batch_norm": true,
             "pretrained_weights": "imagenet",
@@ -67,16 +69,16 @@
         },
         "training": {
             "stage1": {
-                "epochs": 25,
+                "epochs": 30,
                 "batch_size": 32,
                 "learning_rate": 0.001,
                 "freeze_base": true
             },
             "stage2": {
-                "epochs": 45,
+                "epochs": 50,
                 "batch_size": 32,
                 "learning_rate": 0.0001,
-                "unfreeze_layers": 30
+                "unfreeze_layers": 40
             },
             "optimizer": "adam",
             "loss": "categorical_crossentropy",
@@ -91,14 +93,14 @@
         "callbacks": {
             "early_stopping": {
                 "monitor": "val_loss",
-                "patience": 12,
+                "patience": 15,
                 "restore_best_weights": true,
-                "min_delta": 0.001
+                "min_delta": 0.0005
             },
             "reduce_lr": {
                 "monitor": "val_loss",
                 "factor": 0.5,
-                "patience": 5,
+                "patience": 6,
                 "min_lr": 1e-07,
                 "verbose": 1
             },
@@ -148,7 +150,7 @@
             "max_file_size": 10485760
         }
     },
-    "training_completed": "2026-02-18T18:52:07.401910",
+    "training_completed": "2026-02-18T22:30:17.021589",
     "class_names": [
         "Superficial-Intermediate",
         "Parabasal",
