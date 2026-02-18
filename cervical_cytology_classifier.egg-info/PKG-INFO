@@ -1,0 +1,531 @@
+Metadata-Version: 2.1
+Name: cervical-cytology-classifier
+Version: 1.0.0
+Summary: Deep learning system for cervical cytology image classification
+Home-page: https://github.com/yourusername/cervical-cytology-classifier
+Author: Your Name
+Author-email: your.email@example.com
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Healthcare Industry
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Scientific/Engineering :: Medical Science Apps.
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+
+# Cervical Cytology Image Classification System
+
+A deep learning-based system for automated classification of cervical cytology images using the SipakMed dataset. This system classifies cervical cells into five categories using transfer learning with state-of-the-art CNN architectures.
+
+## 📋 Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Dataset](#dataset)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [API Documentation](#api-documentation)
+- [Model Performance](#model-performance)
+- [Frontend Integration](#frontend-integration)
+- [Contributing](#contributing)
+- [License](#license)
+
+## 🎯 Overview
+
+This project implements a production-ready deep learning pipeline for cervical cytology classification with:
+
+- **Transfer Learning**: ResNet50, MobileNetV2, EfficientNetB0, DenseNet121
+- **Two-Stage Training**: Initial head training + fine-tuning
+- **Data Augmentation**: Medical imaging-specific augmentations
+- **Comprehensive Evaluation**: Accuracy, Precision, Recall, F1, ROC-AUC, Cohen's Kappa
+- **Model Interpretability**: Grad-CAM visualizations
+- **Production API**: FastAPI-based REST API for deployment
+- **Frontend Ready**: Easy integration with web/mobile interfaces
+
+## ✨ Features
+
+### Core Features
+- ✅ Transfer learning with multiple pretrained models
+- ✅ Automatic class imbalance handling
+- ✅ Data augmentation for medical images
+- ✅ Two-stage training (freeze → fine-tune)
+- ✅ Early stopping and learning rate scheduling
+- ✅ TensorBoard integration
+- ✅ Comprehensive metrics and visualizations
+- ✅ Grad-CAM for model interpretability
+
+### Production Features
+- ✅ RESTful API with FastAPI
+- ✅ CORS enabled for frontend integration
+- ✅ Batch prediction support
+- ✅ Model versioning and metadata tracking
+- ✅ Configurable via YAML
+- ✅ Docker support (optional)
+
+## 📊 Dataset
+
+**SipakMed Dataset** - Cervical cell images classified into 5 categories:
+
+1. **Superficial-Intermediate**: Normal superficial/intermediate cells
+2. **Parabasal**: Parabasal cells
+3. **Metaplastic**: Metaplastic cells
+4. **Dyskeratotic**: Dyskeratotic cells (abnormal keratinization)
+5. **Koilocytotic**: Koilocytotic cells (HPV-related changes)
+
+### Dataset Structure
+```
+data/raw/
+├── Superficial-Intermediate/
+├── Parabasal/
+├── Metaplastic/
+├── Dyskeratotic/
+└── Koilocytotic/
+```
+
+### Data Split
+- Training: 70%
+- Validation: 15%
+- Testing: 15%
+
+## 🚀 Installation
+
+### Prerequisites
+- Python 3.8 or higher
+- CUDA-capable GPU (recommended)
+- 8GB+ RAM
+
+### Step 1: Clone Repository
+```bash
+git clone https://github.com/yourusername/cervical-cytology-classifier.git
+cd cervical-cytology-classifier
+```
+
+### Step 2: Create Virtual Environment
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+### Step 3: Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### Step 4: Prepare Dataset
+Place your SipakMed dataset in the `data/raw/` directory following the structure above.
+
+## 🎯 Quick Start
+
+### 1. Configure Settings
+Edit `config/config.yaml` to customize:
+- Model architecture (ResNet50, MobileNetV2, etc.)
+- Training hyperparameters
+- Data augmentation settings
+- Paths and directories
+
+### 2. Train Model
+```bash
+python train_model.py
+```
+
+This will:
+- Load and preprocess the dataset
+- Train the model in two stages
+- Save the best model
+- Generate training visualizations
+
+### 3. Evaluate Model
+```bash
+python evaluate_model.py
+```
+
+This will:
+- Evaluate on test set
+- Generate confusion matrix
+- Create ROC curves
+- Compute all metrics
+- Generate Grad-CAM visualizations
+
+### 4. Make Predictions
+```bash
+python predict.py --image path/to/your/image.bmp --all
+```
+
+### 5. Start API Server
+```bash
+cd api
+python app.py
+```
+
+Access API at: `http://localhost:8000`
+API docs at: `http://localhost:8000/docs`
+
+## 📁 Project Structure
+
+```
+cervical-cytology-classifier/
+│
+├── README.md
+├── requirements.txt
+├── config/
+│   └── config.yaml                # Configuration file
+│
+├── data/
+│   └── raw/                       # SipakMed dataset
+│
+├── src/                           # Source code
+│   ├── data_loader.py            # Dataset loading
+│   ├── preprocessing.py          # Preprocessing & augmentation
+│   ├── model.py                  # Model architecture
+│   ├── train.py                  # Training pipeline
+│   ├── evaluate.py               # Evaluation
+│   ├── visualization.py          # Plotting & Grad-CAM
+│   └── utils.py                  # Utilities
+│
+├── api/                          # API for deployment
+│   ├── app.py                    # FastAPI application
+│   └── inference.py              # Inference engine
+│
+├── scripts/                      # Executable scripts
+│   ├── train_model.py           # Training script
+│   ├── evaluate_model.py        # Evaluation script
+│   └── predict.py               # Single prediction
+│
+├── models/                       # Saved models
+│   ├── saved_models/
+│   └── checkpoints/
+│
+└── results/                      # Results & outputs
+    ├── logs/                     # Training logs
+    ├── plots/                    # Visualizations
+    └── reports/                  # Evaluation reports
+```
+
+## ⚙️ Configuration
+
+The `config/config.yaml` file controls all aspects of the system:
+
+```yaml
+# Example configuration
+model:
+  base_model: "ResNet50"          # Model architecture
+  num_classes: 5
+  dense_units: [512, 256]
+  dropout_rates: [0.5, 0.3]
+
+training:
+  stage1:
+    epochs: 10
+    batch_size: 32
+    learning_rate: 0.001
+  stage2:
+    epochs: 30
+    learning_rate: 0.00001
+    unfreeze_layers: 30
+
+augmentation:
+  rotation_range: 20
+  horizontal_flip: true
+  zoom_range: 0.15
+  brightness_range: [0.9, 1.1]
+```
+
+## 📖 Usage
+
+### Training
+
+**Basic Training:**
+```bash
+python train_model.py
+```
+
+**With Custom Config:**
+```bash
+python train_model.py --config path/to/config.yaml
+```
+
+### Evaluation
+
+**Evaluate Best Model:**
+```bash
+python evaluate_model.py
+```
+
+**Evaluate Specific Model:**
+```bash
+python evaluate_model.py --model models/saved_models/model_20240101.h5
+```
+
+### Prediction
+
+**Single Image:**
+```bash
+python predict.py path/to/image.bmp
+```
+
+**Show All Probabilities:**
+```bash
+python predict.py path/to/image.bmp --all
+```
+
+### API Usage
+
+**Start Server:**
+```bash
+cd api
+python app.py
+```
+
+**Make Prediction (curl):**
+```bash
+curl -X POST "http://localhost:8000/predict" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@path/to/image.bmp"
+```
+
+**Make Prediction (Python):**
+```python
+import requests
+
+url = "http://localhost:8000/predict"
+files = {"file": open("image.bmp", "rb")}
+response = requests.post(url, files=files)
+print(response.json())
+```
+
+## 📡 API Documentation
+
+### Endpoints
+
+#### `GET /`
+Health check endpoint
+
+**Response:**
+```json
+{
+  "status": "online",
+  "model_loaded": true,
+  "model_info": {
+    "class_names": [...],
+    "num_classes": 5,
+    "input_shape": [224, 224]
+  }
+}
+```
+
+#### `POST /predict`
+Predict cell type from single image
+
+**Request:**
+- Method: POST
+- Content-Type: multipart/form-data
+- Body: file (image file)
+
+**Response:**
+```json
+{
+  "predicted_class": "Dyskeratotic",
+  "confidence": 0.95,
+  "all_probabilities": {
+    "Superficial-Intermediate": 0.01,
+    "Parabasal": 0.02,
+    "Metaplastic": 0.01,
+    "Dyskeratotic": 0.95,
+    "Koilocytotic": 0.01
+  },
+  "top_3_predictions": [...]
+}
+```
+
+#### `POST /predict_batch`
+Predict multiple images
+
+**Request:**
+- Method: POST
+- Content-Type: multipart/form-data
+- Body: files (list of image files, max 10)
+
+**Response:**
+```json
+{
+  "predictions": [
+    {
+      "filename": "image1.bmp",
+      "predicted_class": "Dyskeratotic",
+      "confidence": 0.95,
+      ...
+    },
+    ...
+  ]
+}
+```
+
+#### `GET /classes`
+Get list of classes
+
+#### `GET /model_info`
+Get model information
+
+## 📊 Model Performance
+
+Expected performance on SipakMed dataset:
+
+| Metric | Value |
+|--------|-------|
+| Accuracy | 93-98% |
+| Precision (macro) | 92-97% |
+| Recall (macro) | 92-97% |
+| F1-Score (macro) | 92-97% |
+| ROC-AUC (macro) | 95-99% |
+| Cohen's Kappa | 0.90-0.97 |
+
+*Note: Actual performance depends on dataset quality and configuration*
+
+## 🌐 Frontend Integration
+
+### React Example
+
+```javascript
+import React, { useState } from 'react';
+import axios from 'axios';
+
+function CellClassifier() {
+  const [result, setResult] = useState(null);
+  
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await axios.post(
+      'http://localhost:8000/predict',
+      formData
+    );
+    
+    setResult(response.data);
+  };
+  
+  return (
+    <div>
+      <input type="file" onChange={handleFileUpload} />
+      {result && (
+        <div>
+          <h3>Predicted: {result.predicted_class}</h3>
+          <p>Confidence: {(result.confidence * 100).toFixed(2)}%</p>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### HTML/JavaScript Example
+
+See `frontend/index.html` for a complete working example.
+
+## 🔬 Advanced Features
+
+### Model Interpretability (Grad-CAM)
+
+Generate Grad-CAM visualizations to understand what the model is focusing on:
+
+```python
+from visualization import GradCAM
+import tensorflow as tf
+
+model = tf.keras.models.load_model('models/saved_models/best_model.h5')
+gradcam = GradCAM(model)
+
+heatmap = gradcam.compute_heatmap(image, predicted_class)
+overlay = gradcam.overlay_heatmap(image, heatmap)
+```
+
+### Custom Training
+
+Modify training behavior by creating custom trainers:
+
+```python
+from train import ModelTrainer
+
+class CustomTrainer(ModelTrainer):
+    def custom_callback(self):
+        # Your custom callback logic
+        pass
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**1. GPU Not Detected**
+```bash
+# Check CUDA installation
+nvidia-smi
+
+# Verify TensorFlow GPU
+python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
+```
+
+**2. Out of Memory**
+- Reduce batch_size in config.yaml
+- Use mixed precision training
+- Use a smaller model (MobileNetV2 instead of ResNet50)
+
+**3. Model Not Found**
+- Ensure training completed successfully
+- Check models/saved_models/ directory
+- Verify model path in config.yaml
+
+## 📝 Citation
+
+If you use this code in your research, please cite:
+
+```bibtex
+@misc{cervical-cytology-classifier,
+  title={Cervical Cytology Classification System},
+  author={Your Name},
+  year={2024},
+  url={https://github.com/yourusername/cervical-cytology-classifier}
+}
+```
+
+## 📄 License
+
+This project is licensed under the MIT License - see LICENSE file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## 📧 Contact
+
+For questions or support:
+- Email: your.email@example.com
+- Issues: [GitHub Issues](https://github.com/yourusername/cervical-cytology-classifier/issues)
+
+## 🙏 Acknowledgments
+
+- SipakMed Dataset creators
+- TensorFlow/Keras team
+- FastAPI developers
+- Medical imaging research community
+
+---
+
+**Note**: This system is for research purposes only. Clinical use requires proper validation and regulatory approval.

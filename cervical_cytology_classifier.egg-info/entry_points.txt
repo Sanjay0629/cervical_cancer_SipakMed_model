@@ -1,0 +1,4 @@
+[console_scripts]
+cervical-eval = scripts.evaluate_model:main
+cervical-predict = scripts.predict:main
+cervical-train = scripts.train_model:main

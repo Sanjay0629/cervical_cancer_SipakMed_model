@@ -1,0 +1,122 @@
+# Optimized Config for BALANCED Dataset
+# Your data is well-balanced, so we focus on better training strategy
+
+dataset:
+  data_dir: "data/raw"
+  classes:
+    - "Superficial-Intermediate"
+    - "Parabasal"
+    - "Metaplastic"
+    - "Dyskeratotic"
+    - "Koilocytotic"
+  
+  train_split: 0.70
+  val_split: 0.15
+  test_split: 0.15
+  seed: 42
+
+preprocessing:
+  target_size: [224, 224]
+  normalize: true
+  stain_normalization: false
+
+# Moderate augmentation
+augmentation:
+  rotation_range: 15
+  width_shift_range: 0.08
+  height_shift_range: 0.08
+  zoom_range: 0.12
+  horizontal_flip: true
+  vertical_flip: false
+  brightness_range: [0.92, 1.08]
+  fill_mode: "nearest"
+
+model:
+  base_model: "DenseNet121"      # Better than ResNet50 for medical images
+  input_shape: [224, 224, 3]
+  num_classes: 5
+  
+  # Stronger classification head
+  dense_units: [512, 256]
+  dropout_rates: [0.4, 0.3]
+  use_batch_norm: true
+  
+  pretrained_weights: "imagenet"
+  freeze_base: true
+
+training:
+  stage1:
+    epochs: 25                    # Train head thoroughly
+    batch_size: 32
+    learning_rate: 0.001          # Standard rate
+    freeze_base: true
+  
+  stage2:
+    epochs: 45                    # Extended fine-tuning
+    batch_size: 32
+    learning_rate: 0.0001         # 10X HIGHER than your failed attempt
+    unfreeze_layers: 30           # Conservative unfreezing
+  
+  optimizer: "adam"
+  loss: "categorical_crossentropy"
+  
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+  
+  use_class_weights: false        # Not needed since balanced
+  mixed_precision: false
+
+callbacks:
+  early_stopping:
+    monitor: "val_loss"
+    patience: 12
+    restore_best_weights: true
+    min_delta: 0.001
+  
+  reduce_lr:
+    monitor: "val_loss"
+    factor: 0.5
+    patience: 5
+    min_lr: 0.0000001
+    verbose: 1
+  
+  model_checkpoint:
+    monitor: "val_accuracy"
+    save_best_only: true
+    mode: "max"
+    save_weights_only: false
+  
+  tensorboard:
+    log_dir: "results/logs"
+    histogram_freq: 1
+
+evaluation:
+  batch_size: 32
+  compute_confusion_matrix: true
+  compute_roc_auc: true
+  compute_classification_report: true
+  compute_cohens_kappa: true
+  generate_gradcam: true
+  num_samples_visualize: 10
+
+cross_validation:
+  enabled: false
+  n_folds: 5
+  stratified: true
+
+paths:
+  models_dir: "models/saved_models"
+  checkpoints_dir: "models/checkpoints"
+  results_dir: "results"
+  logs_dir: "results/logs"
+  plots_dir: "results/plots"
+  reports_dir: "results/reports"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  model_path: "models/saved_models/best_model.h5"
+  allowed_extensions: [".bmp", ".jpg", ".jpeg", ".png"]
+  max_file_size: 10485760

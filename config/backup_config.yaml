@@ -1,0 +1,147 @@
+# Configuration for Cervical Cytology Classification
+
+# Dataset Configuration
+dataset:
+  data_dir: "data/raw"
+  classes:
+    - "Superficial-Intermediate"
+    - "Parabasal"
+    - "Metaplastic"
+    - "Dyskeratotic"
+    - "Koilocytotic"
+
+  # Split ratios
+  train_split: 0.70
+  val_split: 0.15
+  test_split: 0.15
+
+  # Random seed for reproducibility
+  seed: 42
+
+# Image Preprocessing
+preprocessing:
+  target_size: [224, 224]
+  normalize: true
+  stain_normalization: false # Set to true if implementing stain normalization
+
+# Data Augmentation (Training only)
+augmentation:
+  rotation_range: 20
+  width_shift_range: 0.1
+  height_shift_range: 0.1
+  zoom_range: 0.15
+  horizontal_flip: true
+  vertical_flip: false
+  brightness_range: [0.9, 1.1]
+  fill_mode: "nearest"
+
+# Model Configuration
+model:
+  # Choose: 'ResNet50', 'MobileNetV2', 'EfficientNetB0', 'DenseNet121'
+  base_model: "ResNet50"
+  input_shape: [224, 224, 3]
+  num_classes: 5
+
+  # Custom head architecture
+  dense_units: [512, 256]
+  dropout_rates: [0.5, 0.3]
+  use_batch_norm: true
+
+  # Weights
+  pretrained_weights: "imagenet"
+  freeze_base: true # Initially freeze base model
+
+# Training Configuration
+training:
+  # Two-stage training
+  stage1:
+    epochs: 15
+    batch_size: 32
+    learning_rate: 0.001
+    freeze_base: true
+
+  stage2:
+    epochs: 50
+    batch_size: 32
+    learning_rate: 0.00001
+    unfreeze_layers: 50 # Unfreeze last N layers
+
+  # Optimizer
+  optimizer: "adam"
+
+  # Loss function
+  loss: "categorical_crossentropy"
+
+  # Metrics
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+
+  # Class weights (auto-calculated if imbalanced)
+  use_class_weights: true
+
+  # Mixed precision training
+  mixed_precision: false
+
+# Callbacks
+callbacks:
+  early_stopping:
+    monitor: "val_loss"
+    patience: 10
+    restore_best_weights: true
+    min_delta: 0.001
+
+  reduce_lr:
+    monitor: "val_loss"
+    factor: 0.5
+    patience: 5
+    min_lr: 0.0000001
+    verbose: 1
+
+  model_checkpoint:
+    monitor: "val_accuracy"
+    save_best_only: true
+    mode: "max"
+    save_weights_only: false
+
+  tensorboard:
+    log_dir: "results/logs"
+    histogram_freq: 1
+
+# Evaluation
+evaluation:
+  batch_size: 32
+
+  # Metrics to compute
+  compute_confusion_matrix: true
+  compute_roc_auc: true
+  compute_classification_report: true
+  compute_cohens_kappa: true
+
+  # Visualization
+  generate_gradcam: true
+  num_samples_visualize: 10
+
+# Cross-Validation (optional)
+cross_validation:
+  enabled: false
+  n_folds: 5
+  stratified: true
+
+# Paths
+paths:
+  models_dir: "models/saved_models"
+  checkpoints_dir: "models/checkpoints"
+  results_dir: "results"
+  logs_dir: "results/logs"
+  plots_dir: "results/plots"
+  reports_dir: "results/reports"
+
+# API Configuration (for deployment)
+api:
+  host: "0.0.0.0"
+  port: 8000
+  model_path: "models/saved_models/best_model.h5"
+  allowed_extensions: [".bmp", ".jpg", ".jpeg", ".png"]
+  max_file_size: 10485760 # 10 MB
